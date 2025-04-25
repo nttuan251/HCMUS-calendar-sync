@@ -496,3 +496,6 @@ if __name__ == '__main__':
     # Khi chạy ứng dụng ở chế độ phát triển
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app.run(debug=True)
+else:
+    # Khi chạy trên PythonAnywhere
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
