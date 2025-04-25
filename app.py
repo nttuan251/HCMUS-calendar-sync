@@ -20,6 +20,18 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 import random
 
+# Thêm vào đầu file app.py (sau các import)
+import json
+import os
+
+# Xử lý client_secret.json từ biến môi trường khi deploy
+if os.environ.get('CLIENT_SECRET_JSON'):
+    client_secret_data = json.loads(os.environ.get('CLIENT_SECRET_JSON'))
+    
+    # Tạm tạo file để sử dụng với OAuth flow
+    with open('client_secret.json', 'w') as f:
+        json.dump(client_secret_data, f)
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(16)
 
@@ -212,14 +224,16 @@ def process():
     # Chuyển trực tiếp đến trang confirm thay vì qua preview
     return redirect(url_for('confirm'))
 
+# Cập nhật đoạn OAuth để sử dụng URL động
 @app.route('/authorize')
 def authorize():
     # Tạo flow xác thực cho Google OAuth
     flow = Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
     
-    # Đặt URI chuyển hướng CHÍNH XÁC như trong Google Cloud Console
-    flow.redirect_uri = "http://127.0.0.1:5000/oauth2callback"
+    # Sử dụng URL động từ request
+    base_url = request.url_root.rstrip('/')
+    flow.redirect_uri = f"{base_url}/oauth2callback"
     
     # Code còn lại giữ nguyên
     authorization_url, state = flow.authorization_url(
