@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thời Khóa Biểu HCMUS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .instructions h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin-left: 20px;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .feature {
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px;
+            width: 30%;
+            min-width: 250px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .feature h3 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+        @media (max-width: 768px) {
+            .feature {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thời Khóa Biểu HCMUS</h1>
+        
+        <div class="instructions">
+            <h3>Hướng dẫn sử dụng</h3>
+            <ol>
+                <li>Đăng nhập vào Portal HCMUS của bạn.</li>
+                <li>Vào phần xem thời khóa biểu học kỳ.</li>
+                <li>Sao chép toàn bộ bảng thời khóa biểu (Ctrl+A để chọn tất cả, rồi Ctrl+C để sao chép).</li>
+                <li>Dán vào ô bên dưới (Ctrl+V).</li>
+                <li>Nhấn "Xác nhận" để xem trước thời khóa biểu.</li>
+                <li>Kiểm tra thông tin và nhấn "Thêm vào Google Calendar" nếu muốn đồng bộ lịch học với Google Calendar.</li>
+            </ol>
+        </div>
+        
+        <div class="input-container">
+            <h2>Nhập dữ liệu từ HCMUS Portal</h2>
+            <form method="POST" action="/process">
+                <textarea name="input_text" placeholder="Sao chép và dán nội dung từ trang HCMUS Portal vào đây..."></textarea>
+                <button type="submit" class="submit-btn">Xác nhận</button>
+            </form>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>Tự động phân tích</h3>
+                <p>Hệ thống tự động phân tích dữ liệu thời khóa biểu từ Portal HCMUS, trích xuất thông tin về môn học, thời gian và phòng học.</p>
+            </div>
+            <div class="feature">
+                <h3>Xem trước</h3>
+                <p>Xem trước thời khóa biểu theo dạng bảng với đầy đủ thông tin trước khi đồng bộ với Google Calendar.</p>
+            </div>
+            <div class="feature">
+                <h3>Đồng bộ với Google Calendar</h3>
+                <p>Thêm tất cả lịch học vào Google Calendar với đầy đủ thông tin về môn học, phòng học và thời gian. Các sự kiện sẽ được lặp lại theo tuần.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Thời Khóa Biểu HCMUS - Công cụ không chính thức</p>
+            <p>Lưu ý: Đây không phải là công cụ chính thức của trường Đại học Khoa học Tự nhiên, ĐHQG-HCM.</p>
+        </div>  
+    </div>
+</body>
+</html>
