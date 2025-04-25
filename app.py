@@ -36,7 +36,8 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(16)
 
 # Thông tin xác thực Google OAuth
-CLIENT_SECRETS_FILE = "client_secret.json"
+import os
+CLIENT_SECRETS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "client_secret.json")
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 API_SERVICE_NAME = 'calendar'
 API_VERSION = 'v3'
@@ -136,28 +137,17 @@ def get_session_type(start_time):
         return "Tối"
 
 def process_text(input_text):
-    """Xử lý text thời khóa biểu đầu vào"""
-    # Tạo tệp tạm thời để lưu văn bản đầu vào
-    temp_input = tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='UTF-8', suffix='.txt')
-    temp_input.write(input_text)
-    temp_input.close()
-    
-    # Đọc file
+    """Xử lý text thời khóa biểu đầu vào không dùng file tạm"""
     content = []
-    with open(temp_input.name, "r", encoding="UTF-8") as file:
-        lines = file.readlines()
-        
-        for line in lines:
-            row = line.rstrip().split("\t")
-            # Loại bỏ các chuỗi rỗng trong hàng
-            row = [x for x in row if x != ""]
-            if row and len(row) >= 5:  # Đảm bảo có đủ thông tin cần thiết
-                content.append(row)
+    lines = input_text.strip().split('\n')
     
-    # Xóa file tạm sau khi đọc xong
-    os.unlink(temp_input.name)
+    for line in lines:
+        row = line.strip().split("\t")
+        row = [x for x in row if x != ""]
+        if row and len(row) >= 5:
+            content.append(row)
     
-    # Xử lý các hàng dữ liệu
+    # Tiếp tục xử lý như code hiện tại
     courses = []
     for row in content:
         if len(row) >= 5:  # Kiểm tra lại để chắc chắn
