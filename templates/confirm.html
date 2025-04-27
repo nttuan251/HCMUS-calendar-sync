@@ -35,15 +35,12 @@
         <p>Vui lòng chọn tuần bắt đầu và tuần kết thúc cho mỗi môn học:</p>
         
         <form action="{{ url_for('save_course_weeks') }}" method="post">
-            <div class="mb-4">
+            <div class="form-group">
                 <label for="semester_start_date">Ngày bắt đầu học kỳ (Thứ Hai đầu tiên):</label>
-                <input type="date" id="semester_start_date" name="semester_start_date" 
-                       class="form-control" value="{{ semester_start_date }}" required>
-                <small class="form-text text-muted">Chọn ngày Thứ Hai của tuần đầu tiên</small>
-            </div>
-
-            <div class="alert alert-info" id="monday_display">
-                Thứ Hai tuần đầu: <strong id="first_monday">...</strong>
+                <input type="text" class="form-control form-control-sm w-auto" id="semester_start_date" name="semester_start_date" 
+                       value="{{ semester_start_date }}" placeholder="DD/MM/YYYY" required 
+                       style="width: 150px !important; background-color: white; cursor: pointer; border: 1px solid #ced4da;">
+                <small class="form-text text-muted">Nhấp vào ô trên để chọn ngày.</small>
             </div>
 
             <table class="table table-striped table-bordered">
@@ -98,25 +95,12 @@
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Hiển thị ngày thứ 2 đầu tiên
-        function updateFirstMondayDisplay() {
-            const dateInput = document.getElementById('semester_start_date');
-            if (dateInput.value) {
-                const date = new Date(dateInput.value);
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('first_monday').textContent = date.toLocaleDateString('vi-VN', options);
-            } else {
-                document.getElementById('first_monday').textContent = "Chưa chọn ngày";
-            }
-        }
-        
-        // Lắng nghe sự kiện thay đổi ngày
-        document.getElementById('semester_start_date').addEventListener('change', updateFirstMondayDisplay);
-        
-        // Lắng nghe tất cả các trường nhập liệu tuần bắt đầu
+        // Giữ lại phần lắng nghe tuần bắt đầu/kết thúc
         document.querySelectorAll('.start-week').forEach(function(startWeekInput) {
             const row = startWeekInput.closest('tr');
             const endWeekInput = row.querySelector('.end-week');
@@ -148,9 +132,29 @@
             
             semesterStartDateInput.value = `${year}-${month}-${day}`;
         }
-        
-        // Hiển thị ngày thứ 2 đầu tiên ngay khi trang tải
-        updateFirstMondayDisplay();
+
+        // Cấu hình date picker
+        const datePicker = flatpickr("#semester_start_date", {
+            dateFormat: "d/m/Y", // DD/MM/YYYY
+            locale: "vn",
+            weekNumbers: true,
+            firstDayOfWeek: 1, // Thứ 2 là ngày đầu tuần
+            onChange: function(selectedDates, dateStr) {
+                // Đảm bảo ngày được chọn là thứ 2
+                const selectedDate = selectedDates[0];
+                const dayOfWeek = selectedDate.getDay(); // 0=CN, 1=T2, ...
+                
+                // Nếu không phải thứ 2 (getDay() trả về 0 cho CN, 1 cho thứ 2...)
+                if (dayOfWeek !== 1) {
+                    // Tìm ngày thứ 2 gần nhất
+                    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                    const monday = new Date(selectedDate);
+                    monday.setDate(selectedDate.getDate() - daysToSubtract);
+                    
+                    datePicker.setDate(monday);
+                }
+            }
+        });
     });
     </script>
 </body>

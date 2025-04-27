@@ -298,7 +298,8 @@ def create_events():
     # Xác định ngày bắt đầu học kỳ
     if 'semester_start_date' in session and session['semester_start_date']:
         try:
-            start_of_semester = datetime.datetime.strptime(session['semester_start_date'], '%Y-%m-%d').date()
+            # Cập nhật định dạng từ DD/MM/YYYY
+            start_of_semester = datetime.datetime.strptime(session['semester_start_date'], '%d/%m/%Y').date()
             # Tìm ngày Thứ Hai của tuần chứa ngày này
             start_of_week = start_of_semester - datetime.timedelta(days=start_of_semester.weekday())
         except:
@@ -426,6 +427,8 @@ def create_events():
     
     return render_template('result.html', events=created_events)
 
+
+
 @app.route('/confirm', methods=['GET', 'POST'])
 def confirm():
     """Cho phép người dùng chọn tuần bắt đầu và kết thúc cho các môn học"""
@@ -440,10 +443,10 @@ def confirm():
             # Lưu vào session để sử dụng sau này
             session['semester_start_date'] = semester_start_date
     else:
-        # Khi truy cập bằng GET, set semester_start_date thành ngày thứ 2 hiện tại
-        today = datetime.date.today()
-        start_of_week = today - datetime.timedelta(days=today.weekday())
-        semester_start_date = start_of_week.strftime('%Y-%m-%d')
+        # Khi truy cập bằng GET, xác định ngày bắt đầu dựa trên dữ liệu khóa học
+        start_of_week = determine_first_week(session['courses'])
+        # Thay đổi định dạng thành DD/MM/YYYY
+        semester_start_date = start_of_week.strftime('%d/%m/%Y')
     
     return render_template('confirm.html', 
                           courses=session['courses'], 
@@ -481,6 +484,57 @@ def save_course_weeks():
     
     # Chuyển hướng đến xác thực Google
     return redirect(url_for('authorize'))
+
+def determine_first_week(courses):
+    """Xác định ngày bắt đầu tuần đầu tiên là ngày Thứ Hai của tuần chứa ngày học sớm nhất"""
+    # Ngày mặc định là thứ Hai của tuần hiện tại
+    today = datetime.date.today()
+    default_week_start = today - datetime.timedelta(days=today.weekday())
+    
+    # Nếu không có dữ liệu khóa học, trả về giá trị mặc định
+    if not courses:
+        return default_week_start
+    
+    # Tìm tuần bắt đầu sớm nhất (nếu có trong dữ liệu)
+    earliest_date = None
+    
+    # Xác định ngày thứ Hai của tuần hiện tại để làm cơ sở
+    monday_of_current_week = today - datetime.timedelta(days=today.weekday())
+    
+    # Tìm tuần học sớm nhất trong dữ liệu
+    for course in courses:
+        # Đảm bảo có đủ dữ liệu và có tuần bắt đầu
+        if len(course) >= 6 and course[5]:
+            try:
+                # Cố gắng chuyển đổi chuỗi thành giá trị số
+                # Nếu là một số nguyên (tuần học)
+                start_week = int(course[5])
+                # Tính ngày thứ Hai của tuần start_week
+                course_start_date = monday_of_current_week + datetime.timedelta(weeks=start_week-1)
+                
+                if earliest_date is None or course_start_date < earliest_date:
+                    earliest_date = course_start_date
+                    
+            except ValueError:
+                # Nếu không phải số nguyên, thử parse chuỗi ngày DD/MM/YYYY
+                try:
+                    date_str = course[5].strip()
+                    if date_str and '/' in date_str:
+                        course_date = datetime.datetime.strptime(date_str, '%d/%m/%Y').date()
+                        # Tính ngày thứ Hai của tuần chứa ngày này
+                        monday_of_week = course_date - datetime.timedelta(days=course_date.weekday())
+                        
+                        if earliest_date is None or monday_of_week < earliest_date:
+                            earliest_date = monday_of_week
+                except:
+                    # Bỏ qua nếu không thể parse
+                    continue
+    
+    # Nếu không tìm thấy ngày hợp lệ, trả về ngày mặc định
+    if earliest_date is None:
+        return default_week_start
+    
+    return earliest_date
 
 if __name__ == '__main__':
     # Khi chạy ứng dụng ở chế độ phát triển
